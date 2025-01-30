@@ -1,9 +1,15 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { TasksModule } from './tasks/tasks.module';
-import { typeOrmConfig, appConfigSchema, ConfigType } from './config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import {
+  typeOrmConfig,
+  appConfigSchema,
+  TConfigService,
+} from './config';
+import { Task, TaskLabel } from './tasks/entities';
+import { User } from './users/entities';
 
 /**
  * Application module.
@@ -26,10 +32,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (
-        configService: ConfigService<ConfigType>,
-      ) => ({
+      useFactory: async (configService: TConfigService) => ({
         ...(await configService.get('db')),
+        entities: [Task, User, TaskLabel],
       }),
     }),
 

@@ -1,17 +1,21 @@
 import * as Joi from 'joi';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * Interface defining the shape of the application configuration.
  * This interface is used to type-check the configuration object.
  */
-export interface ConfigType {
+interface ConfigType {
   /**
    * Database configuration options.
    * This property is used to configure the TypeORM database connection.
    */
   db: TypeOrmModuleOptions;
 }
+
+// extend the ConfigService class with the ConfigType interface
+export class TConfigService extends ConfigService<ConfigType> {}
 
 /**
  * Joi validation schema for the application configuration.
@@ -47,4 +51,13 @@ export const appConfigSchema = Joi.object({
    * Required.
    */
   DB_NAME: Joi.string().required(),
+
+  /**
+   * Database synchronization flag.
+   * 0: disable synchronization
+   * 1: enable synchronization
+   * Required.
+   * Warning: Be careful when enabling synchronization, as it will drop all tables and recreate them.
+   */
+  DB_SYNC: Joi.number().valid(0, 1).required(),
 });

@@ -10,42 +10,87 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { TasksService } from './tasks.service';
-import { ITask } from './task.model';
-import { CreateTaskDto, TaskIdDto, UpdateTaskDto } from './task.dto';
+import {
+  CreateTaskDto,
+  CreateTaskLabelDto,
+  TaskFiltersQueries,
+  TaskIdParams,
+  UpdateTaskDto,
+} from './dto';
 import { WrongTaskStatusException } from './exceptions';
+import { Task } from './entities';
+import { PaginationQueries, PaginationResponse } from 'src/common';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
+  // add labels to task
+  @Post(':id/labels')
+  public async addLabels(
+    @Param() params: TaskIdParams,
+    @Body() body: CreateTaskLabelDto[],
+  ): Promise<Task> {
+    const task = await this.findOneOrFail(params.id);
+
+    return this.tasksService.addLabels(task, body);
+  }
+
+  // Remove labels from task
+  @Delete(':id/labels')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async removeLabels(
+    @Param() params: TaskIdParams,
+    @Body() body: string[],
+  ): Promise<void> {
+    const task = await this.findOneOrFail(params.id);
+
+    await this.tasksService.removeLabels(task, body);
+  }
+
   // find all tasks
   @Get()
-  public findAll(): ITask[] {
-    return this.tasksService.findAll();
+  public async findAll(
+    @Query() filters: TaskFiltersQueries,
+    @Query() pagination: PaginationQueries,
+  ): Promise<PaginationResponse<Task>> {
+    const [items, total] = await this.tasksService.findAll(
+      filters,
+      pagination,
+    );
+
+    return {
+      data: items,
+      meta: {
+        total,
+        ...pagination,
+      },
+    };
   }
 
   // find one task by id
   @Get(':id')
-  public findOne(@Param() params: TaskIdDto): ITask {
+  public async findOne(@Param() params: TaskIdParams): Promise<Task> {
     return this.findOneOrFail(params.id);
   }
 
   // create a new task
   @Post()
-  public create(@Body() body: CreateTaskDto): ITask {
+  public async create(@Body() body: CreateTaskDto): Promise<Task> {
     return this.tasksService.create(body);
   }
 
   // update a task
   @Patch(':id')
-  public update(
-    @Param() params: TaskIdDto,
+  public async update(
+    @Param() params: TaskIdParams,
     @Body() body: UpdateTaskDto,
-  ): ITask {
-    const task = this.findOneOrFail(params.id);
+  ): Promise<Task> {
+    const task = await this.findOneOrFail(params.id);
 
     try {
       return this.tasksService.update(task, body);
@@ -60,14 +105,18 @@ export class TasksController {
   // delete a task
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public delete(@Param() params: TaskIdDto): void {
-    const task = this.findOneOrFail(params.id);
-    this.tasksService.delete(task);
+  public async delete(@Param() params: TaskIdParams): Promise<void> {
+    const task = await this.findOneOrFail(params.id);
+    await this.tasksService.delete(task);
   }
 
-  // private method find one or fail
-  private findOneOrFail(id: string): ITask {
-    const task = this.tasksService.findOne(id);
+  // private methods
+  //
+  //
+  //
+  // find one or fail
+  private async findOneOrFail(id: string): Promise<Task> {
+    const task = await this.tasksService.findOne(id);
 
     if (!task) {
       throw new NotFoundException(`Task with id [${id}] not found`);

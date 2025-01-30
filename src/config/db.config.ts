@@ -27,6 +27,9 @@ export const typeOrmConfig = registerAs(
 
       // Set the database name (defaults to 'tasks' if not provided)
       database: process.env.DB_NAME ?? 'tasks',
+
+      // Set the entities to be loaded
+      synchronize: Boolean(process.env.DB_SYNC ?? 'false'),
     };
   },
 );

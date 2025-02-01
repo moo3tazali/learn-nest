@@ -6,26 +6,36 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Expose } from 'class-transformer';
 
-import { Task } from 'src/tasks/entities';
+import { Task } from '../../tasks/entities';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
+  @Expose()
   id: string;
 
   @Column()
+  @Expose()
   name: string;
 
   @Column()
+  @Expose()
   email: string;
 
+  @Column()
+  password: string;
+
   @CreateDateColumn()
+  @Expose()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @Expose()
   updatedAt: Date;
 
   @OneToMany(() => Task, (task) => task.user)
+  @Expose()
   tasks: Task[];
 }

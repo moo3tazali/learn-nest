@@ -7,9 +7,11 @@ import {
   typeOrmConfig,
   appConfigSchema,
   TConfigService,
+  authConfig,
 } from './config';
 import { Task, TaskLabel } from './tasks/entities';
 import { User } from './users/entities';
+import { UsersModule } from './users/users.module';
 
 /**
  * Application module.
@@ -19,7 +21,7 @@ import { User } from './users/entities';
   imports: [
     // Configure the application configuration module
     ConfigModule.forRoot({
-      load: [typeOrmConfig],
+      load: [typeOrmConfig, authConfig],
       isGlobal: true,
       validationSchema: appConfigSchema,
       validationOptions: {
@@ -38,8 +40,9 @@ import { User } from './users/entities';
       }),
     }),
 
-    // Import the tasks module
+    // Import modules
     TasksModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

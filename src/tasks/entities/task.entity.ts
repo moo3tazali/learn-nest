@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 
 import { TaskStatus } from '../model';
-import { User } from 'src/users/entities';
 import { TaskLabel } from './task-label.entity';
+import { User } from '../../users/entities';
 
 /**
  * Task entity.

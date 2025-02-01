@@ -23,7 +23,7 @@ import {
 } from './dto';
 import { WrongTaskStatusException } from './exceptions';
 import { Task } from './entities';
-import { PaginationQueries, PaginationResponse } from 'src/common';
+import { PaginationQueries, PaginationResponse } from '../common';
 
 @Controller('tasks')
 export class TasksController {

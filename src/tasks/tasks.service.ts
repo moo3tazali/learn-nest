@@ -11,7 +11,7 @@ import {
 } from './dto';
 import { WrongTaskStatusException } from './exceptions';
 import { Task, TaskLabel } from './entities';
-import { PaginationQueries } from 'src/common';
+import { PaginationQueries } from '../common';
 
 @Injectable()
 export class TasksService {

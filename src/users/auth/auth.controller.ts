@@ -11,6 +11,7 @@ import {
   SerializeOptions,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from '../dto';
@@ -55,6 +56,7 @@ export class AuthController {
     }
   }
 
+  @ApiBearerAuth()
   @Get('profile')
   public async getProfile(@Auth('sub') id: string): Promise<User> {
     const user = await this.userService.findOneById(id);

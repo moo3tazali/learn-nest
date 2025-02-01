@@ -12,6 +12,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { TasksService } from './tasks.service';
 import {
@@ -26,6 +27,7 @@ import { Task } from './entities';
 import { PaginationQueries, PaginationResponse } from '../common';
 import { Auth } from '../users/decorators';
 
+@ApiBearerAuth()
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}

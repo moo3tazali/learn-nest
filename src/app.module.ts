@@ -12,8 +12,8 @@ import {
   authConfig,
   AuthConfig,
 } from './config';
-import { Task, TaskLabel } from './tasks/entities';
 import { User } from './users/entities';
+import { Task, TaskLabel } from './tasks/entities';
 import { UsersModule } from './users/users.module';
 import { AuthGuard } from './users/auth/auth.guard';
 

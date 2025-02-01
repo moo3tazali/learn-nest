@@ -8,6 +8,7 @@ import { PasswordService } from './password/password.service';
 import { UserService } from './user/user.service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -22,7 +23,16 @@ import { AuthController } from './auth/auth.controller';
       }),
     }),
   ],
-  providers: [UserService, PasswordService, AuthService],
+  providers: [
+    UserService,
+    PasswordService,
+    AuthService,
+    AuthGuard,
+    {
+      provide: TConfigService,
+      useExisting: ConfigService,
+    },
+  ],
   controllers: [AuthController],
 })
 export class UsersModule {}

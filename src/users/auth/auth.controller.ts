@@ -3,18 +3,23 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   SerializeOptions,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from '../dto';
 import { User } from '../entities';
 import { UserExistException } from '../exceptions';
 import { LoginResponse } from './login.response';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -43,5 +48,11 @@ export class AuthController {
       }
       throw error;
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  public getProfile(@Req() req: Request): User {
+    return req.user;
   }
 }

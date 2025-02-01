@@ -6,27 +6,31 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Post,
-  Req,
   SerializeOptions,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from '../dto';
 import { User } from '../entities';
 import { UserExistException } from '../exceptions';
 import { LoginResponse } from './login.response';
-import { AuthGuard } from './auth.guard';
+import { Public } from '../decorators';
+import { UserService } from '../user/user.service';
+import { Auth } from '../decorators';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 @SerializeOptions({ strategy: 'excludeAll' })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   public async login(
@@ -36,6 +40,7 @@ export class AuthController {
     return new LoginResponse({ accessToken });
   }
 
+  @Public()
   @Post('register')
   public async register(
     @Body() createUserDto: CreateUserDto,
@@ -50,9 +55,12 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthGuard)
   @Get('profile')
-  public getProfile(@Req() req: Request): User {
-    return req.user;
+  public async getProfile(@Auth('sub') id: string): Promise<User> {
+    const user = await this.userService.findOneById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }

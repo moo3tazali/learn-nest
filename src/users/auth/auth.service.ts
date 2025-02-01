@@ -6,6 +6,7 @@ import { CreateUserDto, LoginUserDto } from '../dto';
 import { UserExistException } from '../exceptions';
 import { User } from '../entities';
 import { PasswordService } from '../password/password.service';
+import { Payload } from '../model';
 
 @Injectable()
 export class AuthService {
@@ -51,10 +52,11 @@ export class AuthService {
   }
 
   private generateToken(user: User): string {
-    const payload = {
+    const payload: Payload = {
       sub: user.id,
       email: user.email,
       name: user.name,
+      roles: user.roles,
     };
     return this.jwtService.sign(payload);
   }

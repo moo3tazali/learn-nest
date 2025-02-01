@@ -8,7 +8,7 @@ import { AuthConfig } from './auth.config';
  * Interface defining the shape of the application configuration.
  * This interface is used to type-check the configuration object.
  */
-interface ConfigType {
+export interface ConfigType {
   /**
    * Database configuration options.
    * This property is used to configure the TypeORM database connection.

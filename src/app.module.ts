@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 
 import { TasksModule } from './tasks/tasks.module';
 import {
@@ -8,10 +10,12 @@ import {
   appConfigSchema,
   TConfigService,
   authConfig,
+  AuthConfig,
 } from './config';
 import { Task, TaskLabel } from './tasks/entities';
 import { User } from './users/entities';
 import { UsersModule } from './users/users.module';
+import { AuthGuard } from './users/auth/auth.guard';
 
 /**
  * Application module.
@@ -40,9 +44,22 @@ import { UsersModule } from './users/users.module';
       }),
     }),
 
+    // Configure the authentication module
+    JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: (config: TConfigService) => ({
+        secret: config.get<AuthConfig>('auth')?.jwt.secret,
+        signOptions: {
+          expiresIn: config.get<AuthConfig>('auth')?.jwt.expiresIn,
+        },
+      }),
+    }),
+
     // Import modules
     TasksModule,
     UsersModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {}

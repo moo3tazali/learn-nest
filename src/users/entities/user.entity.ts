@@ -9,6 +9,7 @@ import {
 import { Expose } from 'class-transformer';
 
 import { Task } from '../../tasks/entities';
+import { UserRole } from '../model';
 
 @Entity()
 export class User {
@@ -38,4 +39,8 @@ export class User {
   @OneToMany(() => Task, (task) => task.user)
   @Expose()
   tasks: Task[];
+
+  @Column('text', { array: true, default: [UserRole.USER] })
+  @Expose()
+  roles: UserRole[];
 }

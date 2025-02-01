@@ -24,6 +24,7 @@ import {
 import { WrongTaskStatusException } from './exceptions';
 import { Task } from './entities';
 import { PaginationQueries, PaginationResponse } from '../common';
+import { Auth } from '../users/decorators';
 
 @Controller('tasks')
 export class TasksController {
@@ -80,8 +81,13 @@ export class TasksController {
 
   // create a new task
   @Post()
-  public async create(@Body() body: CreateTaskDto): Promise<Task> {
-    return this.tasksService.create(body);
+  public async create(
+    @Auth('sub') userId: string,
+    @Body() body: CreateTaskDto,
+  ): Promise<Task> {
+    const task = { ...body, userId };
+
+    return this.tasksService.create(task);
   }
 
   // update a task

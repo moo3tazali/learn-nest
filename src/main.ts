@@ -1,18 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import * as express from 'express';
 
 import { AppModule } from './app.module';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const server = express();
-
-  const app = await NestFactory.create(
-    AppModule,
-    new ExpressAdapter(server),
-  );
+  const app = await NestFactory.create(AppModule);
 
   // use global validation pipe to validate DTOs in the controllers
   app.useGlobalPipes(
@@ -38,6 +33,9 @@ async function bootstrap() {
 
   // use global prefix for all routes
   app.setGlobalPrefix('api');
+
+  // Serve static files for Swagger UI
+  app.use('/docs', express.static(join(__dirname, '../swagger-ui')));
 
   await app.listen(process.env.PORT ?? 3000);
 }

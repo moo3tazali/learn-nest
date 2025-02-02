@@ -3,8 +3,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import * as express from 'express';
-import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,9 +31,6 @@ async function bootstrap() {
 
   // use global prefix for all routes
   app.setGlobalPrefix('api');
-
-  // Serve static files for Swagger UI
-  app.use('/docs', express.static(join(__dirname, '../swagger-ui')));
 
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -18,9 +18,11 @@ import { CreateUserDto, LoginUserDto } from '../dto';
 import { User } from '../entities';
 import { UserExistException } from '../exceptions';
 import { LoginResponse } from './login.response';
-import { Public } from '../decorators';
+import { Public, Roles } from '../decorators';
 import { UserService } from '../user/user.service';
 import { Auth } from '../decorators';
+import { AdminResponse } from './admin.response';
+import { UserRole } from '../model';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -64,5 +66,12 @@ export class AuthController {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  @ApiBearerAuth()
+  @Roles(UserRole.ADMIN)
+  @Get('admin')
+  public adminOnly(): AdminResponse {
+    return new AdminResponse({ message: 'You are an admin' });
   }
 }

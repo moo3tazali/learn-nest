@@ -16,6 +16,7 @@ import { User } from './users/entities';
 import { Task, TaskLabel } from './tasks/entities';
 import { UsersModule } from './users/users.module';
 import { AuthGuard } from './users/auth/auth.guard';
+import { RolesGuard } from './users/auth/roles.guard';
 
 /**
  * Application module.
@@ -60,6 +61,9 @@ import { AuthGuard } from './users/auth/auth.guard';
     TasksModule,
     UsersModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class AppModule {}

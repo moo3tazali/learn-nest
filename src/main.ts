@@ -18,9 +18,6 @@ async function bootstrap() {
     }),
   );
 
-  // use global prefix for all routes
-  app.setGlobalPrefix('api');
-
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Nest App')
@@ -30,7 +27,10 @@ async function bootstrap() {
     .build();
 
   const document = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
+
+  // use global prefix for all routes
+  app.setGlobalPrefix('api');
 
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -12,7 +12,7 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
 
-import { TaskStatus } from '../model';
+import { SortOrderEnum, TaskStatus } from '../model';
 import { CreateTaskLabelDto } from './task-label.dto';
 
 // task data transfer object
@@ -28,6 +28,8 @@ export class CreateTaskDto {
   @IsNotEmpty()
   @IsEnum(TaskStatus)
   status: TaskStatus;
+
+  userId: string;
 
   @IsOptional()
   @ValidateNested({ each: true })
@@ -76,8 +78,6 @@ export class TaskFiltersQueries {
   sortBy?: string = 'createdAt';
 
   @IsOptional()
-  @IsEnum(['ASC', 'DESC'], {
-    message: 'Sort order must be ASC or DESC',
-  })
-  sortOrder?: 'ASC' | 'DESC' = 'DESC';
+  @IsEnum(SortOrderEnum)
+  sortOrder?: SortOrderEnum = SortOrderEnum.DESC;
 }

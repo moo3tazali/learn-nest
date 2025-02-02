@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -37,8 +38,11 @@ export class TasksController {
   public async addLabels(
     @Param() params: TaskIdParams,
     @Body() body: CreateTaskLabelDto[],
+    @Auth('sub') userId: string,
   ): Promise<Task> {
     const task = await this.findOneOrFail(params.id);
+
+    this.checkTaskOwnership(task, userId);
 
     return this.tasksService.addLabels(task, body);
   }
@@ -49,8 +53,11 @@ export class TasksController {
   public async removeLabels(
     @Param() params: TaskIdParams,
     @Body() body: string[],
+    @Auth('sub') userId: string,
   ): Promise<void> {
     const task = await this.findOneOrFail(params.id);
+
+    this.checkTaskOwnership(task, userId);
 
     await this.tasksService.removeLabels(task, body);
   }
@@ -60,10 +67,12 @@ export class TasksController {
   public async findAll(
     @Query() filters: TaskFiltersQueries,
     @Query() pagination: PaginationQueries,
+    @Auth('sub') userId: string,
   ): Promise<PaginationResponse<Task>> {
     const [items, total] = await this.tasksService.findAll(
       filters,
       pagination,
+      userId,
     );
 
     return {
@@ -77,8 +86,15 @@ export class TasksController {
 
   // find one task by id
   @Get(':id')
-  public async findOne(@Param() params: TaskIdParams): Promise<Task> {
-    return this.findOneOrFail(params.id);
+  public async findOne(
+    @Param() params: TaskIdParams,
+    @Auth('sub') userId: string,
+  ): Promise<Task> {
+    const taks = await this.findOneOrFail(params.id);
+
+    this.checkTaskOwnership(taks, userId);
+
+    return taks;
   }
 
   // create a new task
@@ -97,8 +113,11 @@ export class TasksController {
   public async update(
     @Param() params: TaskIdParams,
     @Body() body: UpdateTaskDto,
+    @Auth('sub') userId: string,
   ): Promise<Task> {
     const task = await this.findOneOrFail(params.id);
+
+    this.checkTaskOwnership(task, userId);
 
     try {
       return this.tasksService.update(task, body);
@@ -113,8 +132,14 @@ export class TasksController {
   // delete a task
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async delete(@Param() params: TaskIdParams): Promise<void> {
+  public async delete(
+    @Param() params: TaskIdParams,
+    @Auth('sub') userId: string,
+  ): Promise<void> {
     const task = await this.findOneOrFail(params.id);
+
+    this.checkTaskOwnership(task, userId);
+
     await this.tasksService.delete(task);
   }
 
@@ -131,5 +156,13 @@ export class TasksController {
     }
 
     return task;
+  }
+
+  private checkTaskOwnership(task: Task, userId: string): void {
+    if (task.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to access this resource',
+      );
+    }
   }
 }

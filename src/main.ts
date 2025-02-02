@@ -1,11 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as express from 'express';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const server = express();
+
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(server),
+  );
 
   // use global validation pipe to validate DTOs in the controllers
   app.useGlobalPipes(

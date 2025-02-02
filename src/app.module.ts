@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { TasksModule } from './tasks/tasks.module';
 import {
-  typeOrmConfig,
+  typeOrmProdConfig,
   appConfigSchema,
   TConfigService,
   authConfig,
@@ -26,7 +26,7 @@ import { RolesGuard } from './users/auth/roles.guard';
   imports: [
     // Configure the application configuration module
     ConfigModule.forRoot({
-      load: [typeOrmConfig, authConfig],
+      load: [typeOrmProdConfig, authConfig],
       isGlobal: true,
       validationSchema: appConfigSchema,
       validationOptions: {

@@ -33,3 +33,14 @@ export const typeOrmConfig = registerAs(
     };
   },
 );
+
+export const typeOrmProdConfig = registerAs(
+  'db',
+  (): TypeOrmModuleOptions => {
+    return {
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+      ssl: true,
+    };
+  },
+);

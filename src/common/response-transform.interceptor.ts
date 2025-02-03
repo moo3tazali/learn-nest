@@ -10,14 +10,13 @@ import { Response } from 'express';
 import { map } from 'rxjs';
 
 @Injectable()
-export class ResponseInterceptor implements NestInterceptor {
+export class ResponseTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
       map((data) => ({
         statusCode: context.switchToHttp().getResponse<Response>()
           .statusCode,
         message: 'OK',
-        errors: null,
         data: data?.data ?? data,
         meta: data?.meta ?? null,
       })),

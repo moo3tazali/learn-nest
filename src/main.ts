@@ -3,7 +3,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import { ResponseInterceptor, ValidationException } from './common';
+import {
+  ResponseTransformInterceptor,
+  CustomBadRequestException,
+} from './common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,8 +22,8 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(new ValidationException());
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new CustomBadRequestException());
+  app.useGlobalInterceptors(new ResponseTransformInterceptor());
 
   // Swagger setup
   const config = new DocumentBuilder()

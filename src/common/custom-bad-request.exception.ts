@@ -7,7 +7,7 @@ import {
 import { Response } from 'express';
 
 @Catch(BadRequestException)
-export class ValidationException implements ExceptionFilter {
+export class CustomBadRequestException implements ExceptionFilter {
   catch(exception: BadRequestException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -15,6 +15,7 @@ export class ValidationException implements ExceptionFilter {
     const exceptionResponse = exception.getResponse();
 
     const errors: { [key: string]: string[] } = {};
+
     if (
       typeof exceptionResponse === 'object' &&
       'message' in exceptionResponse
@@ -23,7 +24,7 @@ export class ValidationException implements ExceptionFilter {
 
       if (Array.isArray(validationErrors)) {
         validationErrors.forEach((message: string) => {
-          const field = message.split(' ').shift() ?? '';
+          const field = message.split(' ').shift() ?? 'root';
 
           if (!errors[field]) {
             errors[field] = [];
